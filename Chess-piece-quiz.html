@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Piece Quiz - AD Chess</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1923;
+    --panel: #1a2535;
+    --card: #1e2d42;
+    --gold: #f5a623;
+    --correct: #4caf7d;
+    --wrong: #e94560;
+    --blue: #00b4d8;
+    --purple: #7c6fcd;
+    --text: #eaf0fb;
+    --muted: #7a8fa6;
+    --border: rgba(255,255,255,0.08);
+  }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+    background-image: radial-gradient(ellipse at 20% 20%, #0a1a30 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 80%, #1a0a2a 0%, transparent 60%);
+  }
+  .screen { display:none; width:100%; max-width:500px; }
+  .screen.active { display:block; }
+  .card { background:var(--panel); border-radius:24px; padding:2rem; border:1px solid var(--border); box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+  .home-link { display:inline-block; font-size:0.82rem; color:var(--muted); margin-bottom:1.2rem; cursor:pointer; font-weight:600; }
+  .home-link:hover { color:var(--text); }
+  .game-title { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--gold); text-align:center; margin-bottom:0.3rem; }
+  .game-subtitle { font-size:0.9rem; color:var(--muted); text-align:center; margin-bottom:1.5rem; line-height:1.6; }
+
+  .rule-box { background:rgba(255,255,255,0.04); border-radius:14px; padding:1rem 1.2rem; margin-bottom:1.5rem; border:1px solid var(--border); }
+  .rule-title { font-family:'Fredoka One',cursive; font-size:0.95rem; color:var(--text); margin-bottom:0.8rem; }
+  .piece-table { width:100%; border-collapse:collapse; }
+  .piece-table th { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; padding:4px 8px; text-align:left; border-bottom:1px solid var(--border); }
+  .piece-table td { font-size:0.88rem; color:var(--text); padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .piece-table tr:last-child td { border-bottom:none; }
+  .nb { display:inline-block; font-family:'Fredoka One',cursive; font-size:0.9rem; background:rgba(245,166,35,0.15); color:var(--gold); padding:2px 10px; border-radius:6px; border:1px solid rgba(245,166,35,0.25); min-width:36px; text-align:center; }
+  .pb { display:inline-block; font-family:'Fredoka One',cursive; font-size:0.85rem; padding:2px 10px; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.05); color:var(--muted); min-width:36px; text-align:center; }
+  .pb.h { background:rgba(76,175,125,0.12); color:var(--correct); border-color:rgba(76,175,125,0.25); }
+  .pb.m { background:rgba(0,180,216,0.12); color:var(--blue); border-color:rgba(0,180,216,0.25); }
+  .pb.l { background:rgba(124,111,205,0.12); color:var(--purple); border-color:rgba(124,111,205,0.25); }
+  .pb.s { background:rgba(233,69,96,0.1); color:var(--wrong); border-color:rgba(233,69,96,0.2); }
+
+  input[type=text] { width:100%; padding:13px 18px; border-radius:14px; border:1.5px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:var(--text); font-family:'Nunito',sans-serif; font-size:1.1rem; font-weight:600; text-align:center; outline:none; margin-bottom:1rem; transition:border-color 0.2s; }
+  input[type=text]:focus { border-color:var(--gold); }
+  input[type=text]::placeholder { color:var(--muted); font-weight:400; }
+  .btn-start { width:100%; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,var(--gold),#c07d10); color:#1a1000; font-family:'Fredoka One',cursive; font-size:1.2rem; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; box-shadow:0 6px 20px rgba(245,166,35,0.35); }
+  .btn-start:hover { transform:translateY(-2px); }
+  .btn-start:active { transform:scale(0.97); }
+
+  .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .player-tag { font-size:0.82rem; color:var(--muted); font-weight:600; }
+  .player-tag span { color:var(--gold); }
+  .q-counter { font-size:0.82rem; color:var(--muted); font-weight:700; }
+  .progress-wrap { background:rgba(255,255,255,0.08); border-radius:99px; height:6px; margin-bottom:1.4rem; overflow:hidden; }
+  .progress-fill { height:6px; border-radius:99px; background:linear-gradient(90deg,var(--gold),#e94560); transition:width 0.4s ease; width:0%; }
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.4rem; }
+  .stat { background:rgba(255,255,255,0.05); border-radius:12px; padding:10px 8px; text-align:center; border:1px solid var(--border); }
+  .stat-label { font-size:10px; color:var(--muted); margin-bottom:2px; text-transform:uppercase; letter-spacing:0.5px; }
+  .stat-val { font-family:'Fredoka One',cursive; font-size:1.5rem; color:var(--text); }
+
+  .prompt-area { text-align:center; padding:1.2rem 0 0.5rem; }
+  .prompt-label { font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:0.5rem; }
+  .prompt-display {
+    font-family:'Fredoka One',cursive; font-size:2.6rem; color:var(--text);
+    letter-spacing:2px; line-height:1; margin-bottom:0.5rem;
+    animation:popIn 0.3s ease;
+  }
+  @keyframes popIn { from{transform:scale(0.6);opacity:0} to{transform:scale(1);opacity:1} }
+  .prompt-sub { font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem; }
+  .question-text { font-size:0.9rem; color:var(--gold); margin:0.8rem 0 1.2rem; font-weight:700; }
+
+  .options-grid { display:grid; gap:10px; margin-bottom:1rem; }
+  .options-grid.cols3 { grid-template-columns:repeat(3,1fr); }
+  .options-grid.cols2 { grid-template-columns:repeat(2,1fr); }
+  .opt {
+    padding:13px 8px; border-radius:14px; border:1.5px solid var(--border);
+    background:rgba(255,255,255,0.04); color:var(--text);
+    font-family:'Fredoka One',cursive; font-size:1rem;
+    cursor:pointer; transition:background 0.15s, border-color 0.15s, transform 0.12s; text-align:center;
+  }
+  .opt:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); transform:translateY(-2px); }
+  .opt:disabled { cursor:default; transform:none; }
+  .opt.correct { background:rgba(76,175,125,0.2); border-color:var(--correct); color:var(--correct); }
+  .opt.wrong   { background:rgba(233,69,96,0.2);  border-color:var(--wrong);   color:var(--wrong); }
+  .opt.reveal  { background:rgba(76,175,125,0.1); border-color:rgba(76,175,125,0.4); color:var(--correct); }
+
+  .feedback-area { min-height:48px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+  .feedback-msg { font-family:'Fredoka One',cursive; font-size:1.1rem; }
+  .feedback-msg.correct { color:var(--correct); }
+  .feedback-msg.wrong   { color:var(--wrong); }
+  .feedback-hint { font-size:0.78rem; color:var(--muted); }
+
+  .end-title { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--gold); text-align:center; margin-bottom:0.7rem; }
+  .stars-row { display:flex; justify-content:center; gap:8px; margin-bottom:1rem; }
+  .star { width:28px; height:28px; background:var(--gold); clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  .star.dim { background:#1e2d42; }
+  .end-score-big { font-family:'Fredoka One',cursive; font-size:3.8rem; color:var(--text); text-align:center; line-height:1; margin-bottom:0.3rem; }
+  .end-score-label { font-size:0.85rem; color:var(--muted); text-align:center; margin-bottom:1.4rem; }
+  .end-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.6rem; }
+  .btn-replay { width:100%; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,var(--correct),#2e7d52); color:#fff; font-family:'Fredoka One',cursive; font-size:1.2rem; cursor:pointer; transition:transform 0.15s; margin-bottom:10px; box-shadow:0 6px 20px rgba(76,175,125,0.35); }
+  .btn-replay:hover { transform:translateY(-2px); }
+  .btn-sec { width:100%; padding:12px; border-radius:14px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:'Fredoka One',cursive; font-size:1rem; cursor:pointer; transition:background 0.15s; }
+  .btn-sec:hover { background:rgba(255,255,255,0.05); color:var(--text); }
+
+  .confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; z-index:0; }
+  .confetti-piece { position:absolute; opacity:0; animation:fall linear forwards; }
+  @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+</style>
+</head>
+<body>
+<div id="confetti-container" class="confetti"></div>
+
+<!-- NAME SCREEN -->
+<div class="screen active" id="name-screen">
+  <div class="card">
+    <a class="home-link" href="index.html">← Back to Home</a>
+    <h1 class="game-title">Piece Quiz</h1>
+    <p class="game-subtitle">How well do you know your chess pieces? Notation, names, and point values!</p>
+    <div class="rule-box">
+      <div class="rule-title">Study this first!</div>
+      <table class="piece-table">
+        <tr><th>Piece</th><th>Notation</th><th>Points</th></tr>
+        <tr><td>King</td>   <td><span class="nb">K</span></td><td><span class="pb s">Special</span></td></tr>
+        <tr><td>Queen</td>  <td><span class="nb">Q</span></td><td><span class="pb h">9 pts</span></td></tr>
+        <tr><td>Rook</td>   <td><span class="nb">R</span></td><td><span class="pb h">5 pts</span></td></tr>
+        <tr><td>Bishop</td> <td><span class="nb">B</span></td><td><span class="pb m">3 pts</span></td></tr>
+        <tr><td>Knight</td> <td><span class="nb">N</span></td><td><span class="pb m">3 pts</span></td></tr>
+        <tr><td>Pawn</td>   <td><span class="nb" style="font-size:0.7rem;color:var(--muted);">none</span></td><td><span class="pb l">1 pt</span></td></tr>
+      </table>
+    </div>
+    <input type="text" id="name-input" placeholder="Your name..." maxlength="20"/>
+    <button class="btn-start" onclick="startGame()">Let's Play!</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="game-screen">
+  <div class="card">
+    <div class="top-bar">
+      <div class="player-tag">Player: <span id="player-tag">—</span></div>
+      <div class="q-counter" id="q-counter">1 / 12</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Score</div><div class="stat-val" id="score-val">0</div></div>
+      <div class="stat"><div class="stat-label">Correct</div><div class="stat-val" id="correct-val">0</div></div>
+      <div class="stat"><div class="stat-label">Streak</div><div class="stat-val" id="streak-val">0</div></div>
+    </div>
+    <div class="prompt-area">
+      <div class="prompt-label" id="prompt-label">Piece name</div>
+      <div class="prompt-display" id="prompt-display">King</div>
+      <div class="prompt-sub" id="prompt-sub"></div>
+      <div class="question-text" id="question-text">What is the notation?</div>
+    </div>
+    <div class="options-grid cols3" id="options-grid"></div>
+    <div class="feedback-area">
+      <div class="feedback-msg" id="feedback-msg"></div>
+      <div class="feedback-hint" id="feedback-hint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div class="screen" id="end-screen">
+  <div class="card">
+    <div class="end-title" id="end-greeting">Well done!</div>
+    <div class="stars-row" id="stars-row"></div>
+    <div class="end-score-big" id="end-score-big">0</div>
+    <div class="end-score-label">points</div>
+    <div class="end-stats">
+      <div class="stat"><div class="stat-label">Correct</div><div class="stat-val" id="e-correct">0</div></div>
+      <div class="stat"><div class="stat-label">Wrong</div><div class="stat-val" id="e-wrong">0</div></div>
+      <div class="stat"><div class="stat-label">Best streak</div><div class="stat-val" id="e-streak">0</div></div>
+    </div>
+    <button class="btn-replay" onclick="restartGame()">Play Again</button>
+    <button class="btn-sec" onclick="window.location.href='index.html'">Back to Home</button>
+  </div>
+</div>
+
+<script>
+const PIECES = [
+  { name:'King',   notation:'K',    points:'Special' },
+  { name:'Queen',  notation:'Q',    points:'9 pts' },
+  { name:'Rook',   notation:'R',    points:'5 pts' },
+  { name:'Bishop', notation:'B',    points:'3 pts' },
+  { name:'Knight', notation:'N',    points:'3 pts' },
+  { name:'Pawn',   notation:'none', points:'1 pt' },
+];
+const ALL_NOTATIONS = ['K','Q','R','B','N','none'];
+const ALL_POINTS    = ['Special','9 pts','5 pts','3 pts','1 pt'];
+const ALL_NAMES     = ['King','Queen','Rook','Bishop','Knight','Pawn'];
+
+const TOTAL = 12;
+let playerName='', score=0, qNum=0, streak=0, bestStreak=0, correctCount=0, wrongCount=0, answered=false;
+let currentPiece, currentQuestion, correctAnswer;
+
+function shuffle(a){ return [...a].sort(()=>Math.random()-0.5); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+function startGame(){
+  playerName = document.getElementById('name-input').value.trim() || 'Champion';
+  score=0;qNum=0;streak=0;bestStreak=0;correctCount=0;wrongCount=0;
+  document.getElementById('player-tag').textContent = playerName;
+  show('game-screen');
+  nextQuestion();
+}
+
+function nextQuestion(){
+  if(qNum>=TOTAL){ showEnd(); return; }
+  answered=false;
+  document.getElementById('feedback-msg').textContent='';
+  document.getElementById('feedback-hint').textContent='';
+
+  currentPiece = PIECES[Math.floor(Math.random()*PIECES.length)];
+
+  /* 3 question types:
+     0 — show PIECE NAME  → ask notation letter
+     1 — show PIECE NAME  → ask point value
+     2 — show NOTATION    → ask piece name
+     3 — show NOTATION    → ask point value
+     4 — show POINT VALUE → ask piece name
+  */
+  const type = Math.floor(Math.random()*5);
+
+  const pLabel = document.getElementById('prompt-label');
+  const pDisplay = document.getElementById('prompt-display');
+  const pSub = document.getElementById('prompt-sub');
+  const qText = document.getElementById('question-text');
+  const grid  = document.getElementById('options-grid');
+  grid.innerHTML='';
+
+  if(type===0){
+    pLabel.textContent='Piece name';
+    pDisplay.textContent=currentPiece.name;
+    pSub.textContent='';
+    qText.textContent='What is the notation letter for this piece?';
+    correctAnswer=currentPiece.notation;
+    grid.className='options-grid cols3';
+    shuffle(ALL_NOTATIONS).forEach(o=>addBtn(grid,o,correctAnswer));
+
+  } else if(type===1){
+    pLabel.textContent='Piece name';
+    pDisplay.textContent=currentPiece.name;
+    pSub.textContent='Notation: '+currentPiece.notation;
+    qText.textContent='How many points is this piece worth?';
+    correctAnswer=currentPiece.points;
+    grid.className='options-grid cols2';
+    shuffle(ALL_POINTS).forEach(o=>addBtn(grid,o,correctAnswer));
+
+  } else if(type===2){
+    pLabel.textContent='Notation letter';
+    pDisplay.textContent=currentPiece.notation;
+    pSub.textContent='';
+    qText.textContent='Which piece does this notation stand for?';
+    correctAnswer=currentPiece.name;
+    grid.className='options-grid cols3';
+    shuffle(ALL_NAMES).forEach(o=>addBtn(grid,o,correctAnswer));
+
+  } else if(type===3){
+    pLabel.textContent='Notation letter';
+    pDisplay.textContent=currentPiece.notation;
+    pSub.textContent='Piece: '+currentPiece.name;
+    qText.textContent='How many points is this piece worth?';
+    correctAnswer=currentPiece.points;
+    grid.className='options-grid cols2';
+    shuffle(ALL_POINTS).forEach(o=>addBtn(grid,o,correctAnswer));
+
+  } else {
+    pLabel.textContent='Point value';
+    pDisplay.textContent=currentPiece.points;
+    pSub.textContent='';
+    qText.textContent='Which piece has this point value?';
+    /* when multiple pieces share 3pts (bishop & knight), accept both */
+    correctAnswer=currentPiece.name;
+    grid.className='options-grid cols3';
+    shuffle(ALL_NAMES).forEach(o=>addBtn(grid,o,correctAnswer));
+  }
+
+  document.getElementById('q-counter').textContent=(qNum+1)+' / '+TOTAL;
+  document.getElementById('score-val').textContent=score;
+  document.getElementById('correct-val').textContent=correctCount;
+  document.getElementById('streak-val').textContent=streak;
+  document.getElementById('progress-fill').style.width=(qNum/TOTAL*100)+'%';
+}
+
+function addBtn(grid, label, correct){
+  const btn=document.createElement('button');
+  btn.className='opt';
+  btn.textContent=label;
+  btn.onclick=()=>answer(label,correct,btn,grid.querySelectorAll('.opt'));
+  grid.appendChild(btn);
+}
+
+function isCorrect(chosen, correct, type){
+  /* for "which piece has 3pts" — bishop AND knight are both right */
+  if(chosen===correct) return true;
+  if(chosen==='Bishop'&&correct==='Knight') return true;
+  if(chosen==='Knight'&&correct==='Bishop') return true;
+  return false;
+}
+
+function answer(chosen, correct, btn, allBtns){
+  if(answered) return;
+  answered=true; qNum++;
+  allBtns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById('feedback-msg');
+  const hint=document.getElementById('feedback-hint');
+  const ok = isCorrect(chosen, correct);
+
+  if(ok){
+    streak++; bestStreak=Math.max(bestStreak,streak); correctCount++;
+    const bonus=streak>=3?2:1; score+=bonus;
+    btn.classList.add('correct');
+    fb.textContent=streak>=3?'Correct! '+streak+'x streak! +'+bonus:'Correct!';
+    fb.className='feedback-msg correct';
+    hint.textContent=streak>=3?'Bonus points!':currentPiece.name+' — '+currentPiece.notation+' — '+currentPiece.points;
+  } else {
+    streak=0; wrongCount++;
+    btn.classList.add('wrong');
+    allBtns.forEach(b=>{ if(b.textContent===correct) b.classList.add('reveal'); });
+    fb.textContent='Wrong!';
+    fb.className='feedback-msg wrong';
+    hint.textContent=currentPiece.name+' | Notation: '+currentPiece.notation+' | Points: '+currentPiece.points;
+  }
+  document.getElementById('score-val').textContent=score;
+  document.getElementById('correct-val').textContent=correctCount;
+  document.getElementById('streak-val').textContent=streak;
+  setTimeout(nextQuestion,1600);
+}
+
+function showEnd(){
+  show('end-screen');
+  document.getElementById('end-score-big').textContent=score;
+  const msg=score>=18?'Perfect, '+playerName+'! You know every piece!'
+    :score>=12?'Wonderful, '+playerName+'! Great piece knowledge!'
+    :score>=6 ?'Good effort, '+playerName+'! Keep studying!'
+    :'Keep practising, '+playerName+'! You will get it!';
+  document.getElementById('end-greeting').textContent=msg;
+  document.getElementById('e-correct').textContent=correctCount;
+  document.getElementById('e-wrong').textContent=wrongCount;
+  document.getElementById('e-streak').textContent=bestStreak;
+  document.getElementById('progress-fill').style.width='100%';
+  const stars=score>=18?3:score>=10?2:1;
+  const row=document.getElementById('stars-row'); row.innerHTML='';
+  for(let i=0;i<3;i++){const d=document.createElement('div');d.className='star'+(i<stars?'':' dim');row.appendChild(d);}
+  if(score>=10) launchConfetti();
+}
+
+function restartGame(){
+  document.getElementById('confetti-container').innerHTML='';
+  score=0;qNum=0;streak=0;bestStreak=0;correctCount=0;wrongCount=0;
+  show('game-screen'); nextQuestion();
+}
+
+function launchConfetti(){
+  const colors=['#f5a623','#e94560','#4caf7d','#00b4d8','#7c6fcd'];
+  const c=document.getElementById('confetti-container'); c.innerHTML='';
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div'); p.className='confetti-piece';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    p.style.width=(8+Math.random()*8)+'px'; p.style.height=p.style.width;
+    p.style.animationDuration=(1.5+Math.random()*2)+'s';
+    p.style.animationDelay=(Math.random()*1.5)+'s';
+    c.appendChild(p);
+  }
+}
+document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key==='Enter')startGame();});
+</script>
+</body>
+</html>
