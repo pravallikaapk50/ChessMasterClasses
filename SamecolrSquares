@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Same Color? Chess Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1b2a;
+    --panel: #1b2838;
+    --accent: #00b4d8;
+    --gold: #f5a623;
+    --white-sq: #f0d9b5;
+    --black-sq: #b58863;
+    --correct: #4caf7d;
+    --wrong: #e94560;
+    --text: #eaf0fb;
+    --muted: #7a8fa6;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-image: radial-gradient(ellipse at 10% 30%, #0a2040 0%, transparent 60%),
+                      radial-gradient(ellipse at 90% 70%, #1a0a30 0%, transparent 60%);
+  }
+
+  .screen { display: none; width: 100%; max-width: 480px; }
+  .screen.active { display: block; }
+
+  .card {
+    background: var(--panel);
+    border-radius: 24px;
+    padding: 2.2rem 2rem;
+    border: 1.5px solid #1e3a5a;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .game-title { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--accent); text-align:center; margin-bottom:0.4rem; }
+  .game-subtitle { font-size:0.95rem; color:var(--muted); text-align:center; margin-bottom:1.5rem; line-height:1.5; }
+
+  .rule-box {
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.8rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .rule-box strong { color: var(--text); }
+
+  input[type=text] {
+    width: 100%;
+    padding: 13px 18px;
+    border-radius: 14px;
+    border: 1.5px solid #1e3a5a;
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+  input[type=text]::placeholder { color: var(--muted); font-weight: 400; }
+
+  .btn-start {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), #0077b6);
+    color: #fff;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 6px 20px rgba(0,180,216,0.35);
+  }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,180,216,0.5); }
+  .btn-start:active { transform: scale(0.97); }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .back-link:hover { color: var(--text); }
+
+  /* game */
+  .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .player-tag { font-size:0.85rem; color:var(--muted); font-weight:600; }
+  .player-tag span { color:var(--gold); }
+  .q-counter { font-size:0.85rem; color:var(--muted); font-weight:700; }
+
+  .progress-wrap { background:rgba(255,255,255,0.08); border-radius:99px; height:6px; margin-bottom:1.4rem; overflow:hidden; }
+  .progress-fill { height:6px; border-radius:99px; background:linear-gradient(90deg,var(--accent),var(--gold)); transition:width 0.4s ease; width:0%; }
+
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.4rem; }
+  .stat { background:rgba(255,255,255,0.05); border-radius:12px; padding:10px 8px; text-align:center; border:1px solid rgba(255,255,255,0.07); }
+  .stat-label { font-size:11px; color:var(--muted); margin-bottom:2px; text-transform:uppercase; letter-spacing:0.5px; }
+  .stat-val { font-family:'Fredoka One',cursive; font-size:1.5rem; color:var(--text); }
+
+  .squares-area { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin:1.2rem 0; }
+  .sq-box {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    padding: 1.2rem 0.5rem;
+    text-align: center;
+  }
+  .sq-name { font-family:'Fredoka One',cursive; font-size:2.8rem; color:var(--text); letter-spacing:3px; animation:popIn 0.3s ease; }
+  @keyframes popIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
+  .sq-sub { font-size:0.75rem; color:var(--muted); margin-top:4px; }
+  .vs-label { font-family:'Fredoka One',cursive; font-size:1.2rem; color:var(--muted); text-align:center; }
+
+  .question-text { font-size:1rem; color:var(--muted); text-align:center; margin:0.2rem 0 1rem; font-weight:600; }
+
+  .answer-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1rem; }
+  .btn-answer {
+    padding: 16px 10px;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-answer:hover { transform:translateY(-3px); }
+  .btn-answer:active { transform:scale(0.96); }
+  .btn-answer:disabled { opacity:0.5; cursor:default; transform:none; }
+
+  .btn-yes { background:linear-gradient(135deg,#1a6b3c,#145e34); color:#7dffb3; box-shadow:0 4px 16px rgba(76,175,125,0.2); }
+  .btn-yes:hover { box-shadow:0 8px 24px rgba(76,175,125,0.4); }
+  .btn-no { background:linear-gradient(135deg,#6b1a1a,#5e1414); color:#ffb3b3; box-shadow:0 4px 16px rgba(233,69,96,0.2); }
+  .btn-no:hover { box-shadow:0 8px 24px rgba(233,69,96,0.4); }
+
+  .btn-answer.correct-flash { animation:correctFlash 0.5s ease; }
+  .btn-answer.wrong-flash { animation:wrongFlash 0.5s ease; }
+  @keyframes correctFlash { 50%{box-shadow:0 0 0 4px var(--correct)} }
+  @keyframes wrongFlash { 50%{box-shadow:0 0 0 4px var(--wrong)} }
+
+  .feedback-area { min-height:52px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+  .feedback-msg { font-family:'Fredoka One',cursive; font-size:1.1rem; }
+  .feedback-msg.correct { color:var(--correct); }
+  .feedback-msg.wrong { color:var(--wrong); }
+  .feedback-hint { font-size:0.8rem; color:var(--muted); }
+
+  /* end */
+  .end-title { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--accent); text-align:center; margin-bottom:0.8rem; }
+  .stars-row { display:flex; justify-content:center; gap:8px; margin-bottom:1rem; }
+  .star { width:30px; height:30px; background:var(--gold); clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  .star.dim { background:#1e3a5a; }
+  .end-score-big { font-family:'Fredoka One',cursive; font-size:4rem; color:var(--text); text-align:center; line-height:1; margin-bottom:0.3rem; }
+  .end-score-label { font-size:0.9rem; color:var(--muted); text-align:center; margin-bottom:1.5rem; }
+  .end-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.8rem; }
+
+  .btn-replay {
+    width:100%; padding:15px; border-radius:14px; border:none;
+    background:linear-gradient(135deg,var(--correct),#2e7d52);
+    color:#fff; font-family:'Fredoka One',cursive; font-size:1.3rem;
+    cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
+    box-shadow:0 6px 20px rgba(76,175,125,0.4); margin-bottom:10px;
+  }
+  .btn-replay:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(76,175,125,0.5); }
+  .btn-replay:active { transform:scale(0.97); }
+
+  .btn-secondary {
+    width:100%; padding:13px; border-radius:14px;
+    border:1.5px solid #1e3a5a; background:transparent;
+    color:var(--muted); font-family:'Fredoka One',cursive; font-size:1.1rem;
+    cursor:pointer; transition:background 0.15s;
+  }
+  .btn-secondary:hover { background:rgba(255,255,255,0.05); color:var(--text); }
+
+  .confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; z-index:0; }
+  .confetti-piece { position:absolute; opacity:0; animation:fall linear forwards; }
+  @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+</style>
+</head>
+<body>
+
+<div id="confetti-container" class="confetti"></div>
+
+<!-- Name screen -->
+<div class="screen active" id="name-screen">
+  <div class="card">
+    <h1 class="game-title">Same Color?</h1>
+    <p class="game-subtitle">Are the two squares the same color? You decide!</p>
+    <div class="rule-box">
+      <strong>How it works:</strong><br>
+      Convert file to number (a=1 ... h=8) and add the rank.<br>
+      If the sum is even — the square is on an even group.<br>
+      If the sum is odd — the square is on an odd group.<br><br>
+      Both same group — <strong>Yes</strong> (same color).<br>
+      Different groups — <strong>No</strong> (different color).<br><br>
+      Example: <strong>c4</strong> = 3+4 = 7 (odd) | <strong>e6</strong> = 5+6 = 11 (odd) — Yes!
+    </div>
+    <input type="text" id="name-input" placeholder="Your name..." maxlength="20"/>
+    <button class="btn-start" onclick="startGame()">Let's Play!</button>
+    <span class="back-link" onclick="window.location.href='chess-square-game.html'">Back to Square Color Game</span>
+  </div>
+</div>
+
+<!-- Game screen -->
+<div class="screen" id="game-screen">
+  <div class="card">
+    <div class="top-bar">
+      <div class="player-tag">Player: <span id="player-tag">—</span></div>
+      <div class="q-counter" id="q-counter">1 / 10</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Score</div><div class="stat-val" id="score-val">0</div></div>
+      <div class="stat"><div class="stat-label">Correct</div><div class="stat-val" id="correct-val">0</div></div>
+      <div class="stat"><div class="stat-label">Streak</div><div class="stat-val" id="streak-val">0</div></div>
+    </div>
+    <div class="squares-area">
+      <div class="sq-box">
+        <div class="sq-name" id="sq1-name">c4</div>
+        <div class="sq-sub">Square 1</div>
+      </div>
+      <div class="vs-label">VS</div>
+      <div class="sq-box">
+        <div class="sq-name" id="sq2-name">e6</div>
+        <div class="sq-sub">Square 2</div>
+      </div>
+    </div>
+    <p class="question-text">Are these squares the same color?</p>
+    <div class="answer-row">
+      <button class="btn-answer btn-yes" id="btn-yes" onclick="answer('yes')">Yes</button>
+      <button class="btn-answer btn-no" id="btn-no" onclick="answer('no')">No</button>
+    </div>
+    <div class="feedback-area">
+      <div class="feedback-msg" id="feedback-msg"></div>
+      <div class="feedback-hint" id="feedback-hint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- End screen -->
+<div class="screen" id="end-screen">
+  <div class="card">
+    <div class="end-title" id="end-greeting">Amazing!</div>
+    <div class="stars-row" id="stars-row">
+      <div class="star"></div><div class="star"></div><div class="star"></div>
+    </div>
+    <div class="end-score-big" id="end-score-big">0</div>
+    <div class="end-score-label">points</div>
+    <div class="end-stats">
+      <div class="stat"><div class="stat-label">Correct</div><div class="stat-val" id="e-correct">0</div></div>
+      <div class="stat"><div class="stat-label">Wrong</div><div class="stat-val" id="e-wrong">0</div></div>
+      <div class="stat"><div class="stat-label">Best streak</div><div class="stat-val" id="e-streak">0</div></div>
+    </div>
+    <button class="btn-replay" onclick="restartGame()">Play Again</button>
+    <button class="btn-secondary" onclick="window.location.href='chess-square-game.html'">Back to Square Color Game</button>
+  </div>
+</div>
+
+<script>
+const files = ['a','b','c','d','e','f','g','h'];
+const TOTAL = 10;
+let playerName='', score=0, qNum=0, streak=0, bestStreak=0, correctCount=0, wrongCount=0, answered=false, currentAnswer='';
+
+function parity(file, rank) {
+  const fi = files.indexOf(file) + 1;
+  return (fi + rank) % 2;
+}
+
+function randomSquare() {
+  const file = files[Math.floor(Math.random()*8)];
+  const rank = Math.floor(Math.random()*8)+1;
+  return { name: file+rank, file, rank };
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame() {
+  playerName = document.getElementById('name-input').value.trim() || 'Champion';
+  score=0; qNum=0; streak=0; bestStreak=0; correctCount=0; wrongCount=0;
+  document.getElementById('player-tag').textContent = playerName;
+  show('game-screen');
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (qNum >= TOTAL) { showEnd(); return; }
+  answered = false;
+  document.getElementById('feedback-msg').textContent = '';
+  document.getElementById('feedback-hint').textContent = '';
+  document.getElementById('btn-yes').disabled = false;
+  document.getElementById('btn-no').disabled = false;
+
+  const sq1 = randomSquare();
+  let sq2 = randomSquare();
+  while (sq2.name === sq1.name) sq2 = randomSquare();
+
+  const p1 = parity(sq1.file, sq1.rank);
+  const p2 = parity(sq2.file, sq2.rank);
+  currentAnswer = (p1 === p2) ? 'yes' : 'no';
+
+  document.getElementById('sq1-name').textContent = sq1.name;
+  document.getElementById('sq2-name').textContent = sq2.name;
+  document.getElementById('q-counter').textContent = (qNum+1) + ' / ' + TOTAL;
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('correct-val').textContent = correctCount;
+  document.getElementById('streak-val').textContent = streak;
+  document.getElementById('progress-fill').style.width = (qNum/TOTAL*100)+'%';
+}
+
+function answer(choice) {
+  if (answered) return;
+  answered = true;
+  qNum++;
+  document.getElementById('btn-yes').disabled = true;
+  document.getElementById('btn-no').disabled = true;
+
+  const fb = document.getElementById('feedback-msg');
+  const hint = document.getElementById('feedback-hint');
+  const sq1 = document.getElementById('sq1-name').textContent;
+  const sq2 = document.getElementById('sq2-name').textContent;
+  const fi1 = files.indexOf(sq1[0])+1, r1=parseInt(sq1[1]);
+  const fi2 = files.indexOf(sq2[0])+1, r2=parseInt(sq2[1]);
+  const sum1 = fi1+r1, sum2 = fi2+r2;
+
+  if (choice === currentAnswer) {
+    streak++; bestStreak = Math.max(bestStreak, streak); correctCount++;
+    const bonus = streak >= 3 ? 2 : 1;
+    score += bonus;
+    fb.textContent = streak >= 3 ? 'Correct! ' + streak + 'x streak! +' + bonus : 'Correct!';
+    fb.className = 'feedback-msg correct';
+    hint.textContent = streak >= 3 ? 'Bonus points!' : 'Well done!';
+    document.getElementById('btn-'+choice).classList.add('correct-flash');
+    setTimeout(()=>document.getElementById('btn-'+choice).classList.remove('correct-flash'), 500);
+  } else {
+    streak = 0; wrongCount++;
+    fb.textContent = 'Wrong! Answer was ' + currentAnswer.toUpperCase() + '.';
+    fb.className = 'feedback-msg wrong';
+    hint.textContent = sq1 + ': ' + fi1 + '+' + r1 + '=' + sum1 + ' (' + (sum1%2===0?'even':'odd') + ')   '
+      + sq2 + ': ' + fi2 + '+' + r2 + '=' + sum2 + ' (' + (sum2%2===0?'even':'odd') + ')   '
+      + (sum1%2===sum2%2 ? 'Same group = Yes' : 'Different groups = No');
+    document.getElementById('btn-'+choice).classList.add('wrong-flash');
+    setTimeout(()=>document.getElementById('btn-'+choice).classList.remove('wrong-flash'), 500);
+  }
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('correct-val').textContent = correctCount;
+  document.getElementById('streak-val').textContent = streak;
+  setTimeout(nextQuestion, 1700);
+}
+
+function showEnd() {
+  show('end-screen');
+  document.getElementById('end-score-big').textContent = score;
+  const msg = score>=15 ? 'Incredible, '+playerName+'! You are a grandmaster!'
+    : score>=10 ? 'Wonderful, '+playerName+'! Sharp mind!'
+    : score>=5  ? 'Good effort, '+playerName+'! Keep going!'
+    : 'Keep trying, '+playerName+'! Practice makes perfect!';
+  document.getElementById('end-greeting').textContent = msg;
+  document.getElementById('e-correct').textContent = correctCount;
+  document.getElementById('e-wrong').textContent = wrongCount;
+  document.getElementById('e-streak').textContent = bestStreak;
+  document.getElementById('progress-fill').style.width = '100%';
+  const stars = score>=15 ? 3 : score>=8 ? 2 : 1;
+  const row = document.getElementById('stars-row');
+  row.innerHTML = '';
+  for (let i=0;i<3;i++) { const d=document.createElement('div'); d.className='star'+(i<stars?'':' dim'); row.appendChild(d); }
+  if (score>=8) launchConfetti();
+}
+
+function restartGame() {
+  document.getElementById('confetti-container').innerHTML='';
+  score=0; qNum=0; streak=0; bestStreak=0; correctCount=0; wrongCount=0;
+  show('game-screen');
+  nextQuestion();
+}
+
+function launchConfetti() {
+  const colors=['#00b4d8','#f5a623','#4caf7d','#e94560','#f0d9b5'];
+  const container=document.getElementById('confetti-container');
+  container.innerHTML='';
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.left=Math.random()*100+'vw';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    p.style.width=(8+Math.random()*8)+'px';
+    p.style.height=(8+Math.random()*8)+'px';
+    p.style.animationDuration=(1.5+Math.random()*2)+'s';
+    p.style.animationDelay=(Math.random()*1.5)+'s';
+    container.appendChild(p);
+  }
+}
+
+document.getElementById('name-input').addEventListener('keydown', e => { if(e.key==='Enter') startGame(); });
+</script>
+</body>
+</html>
