@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg: #0f0f1a;
     --panel: #16213e;
@@ -18,13 +17,12 @@
     --blue: #00b4d8;
     --green: #4caf7d;
     --purple: #7c6fcd;
+    --orange: #ff7043;
     --text: #eaf0fb;
     --muted: #8899bb;
     --border: rgba(255,255,255,0.08);
   }
-
   html { scroll-behavior: smooth; }
-
   body {
     font-family: 'Nunito', sans-serif;
     background: var(--bg);
@@ -34,143 +32,141 @@
       radial-gradient(ellipse at 15% 10%, #1e2a50 0%, transparent 50%),
       radial-gradient(ellipse at 85% 80%, #1a0a30 0%, transparent 50%);
   }
-
   a { text-decoration: none; color: inherit; }
 
   /* ── NAV ── */
   nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(15,15,26,0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,15,26,0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(245,166,35,0.15);
   }
   .nav-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
+    max-width: 1000px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; padding: 0 2rem;
   }
   .nav-logo {
     font-family: 'Fredoka One', cursive;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     color: var(--text);
-    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), #c07d10);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: #1a1000;
   }
   .nav-logo span { color: var(--gold); }
-  .nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-  }
+
+  .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
   .nav-links a {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--muted);
-    transition: color 0.2s;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.88rem; font-weight: 700; color: var(--muted);
+    padding: 7px 14px; border-radius: 99px;
+    transition: color 0.2s, background 0.2s;
   }
-  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .nav-links a.active { color: var(--gold); background: rgba(245,166,35,0.1); }
+
+  .nav-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-games { background: var(--green); }
+  .dot-classes { background: var(--blue); }
+  .dot-about { background: var(--purple); }
+
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-phone {
+    font-size: 0.78rem; font-weight: 700; color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .nav-phone-icon {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(76,175,125,0.2); display: inline-flex;
+    align-items: center; justify-content: center;
+  }
+  .phone-circle { width:8px; height:8px; border-radius:50%; background:var(--green); }
   .nav-cta {
-    padding: 8px 20px;
-    border-radius: 99px;
-    background: var(--gold);
-    color: #1a1000;
-    font-family: 'Fredoka One', cursive;
-    font-size: 0.95rem;
-    cursor: pointer;
-    border: none;
+    padding: 9px 22px; border-radius: 99px;
+    background: var(--gold); color: #1a1000;
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    border: none; cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 4px 14px rgba(245,166,35,0.3);
+    box-shadow: 0 4px 14px rgba(245,166,35,0.35);
   }
-  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,166,35,0.4); }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,166,35,0.5); }
+
+  /* nav stripe */
+  .nav-stripe {
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--accent), var(--blue), var(--green), var(--purple));
+  }
 
   /* ── HERO ── */
   .hero {
-    max-width: 1000px;
-    margin: 0 auto;
+    max-width: 1000px; margin: 0 auto;
     padding: 5rem 2rem 4rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: center;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 3rem; align-items: center;
   }
   .hero-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    display: inline-flex; align-items: center; gap: 8px;
     background: var(--gold-dim);
     border: 1px solid rgba(245,166,35,0.3);
-    border-radius: 99px;
-    padding: 5px 14px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1.2rem;
+    border-radius: 99px; padding: 5px 14px;
+    font-size: 0.75rem; font-weight: 800; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 1.2rem;
   }
-  .hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+  .tag-pulse {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
   .hero-title {
     font-family: 'Fredoka One', cursive;
-    font-size: 3.2rem;
-    line-height: 1.1;
-    color: var(--text);
-    margin-bottom: 1rem;
+    font-size: 3.4rem; line-height: 1.1; color: var(--text); margin-bottom: 1rem;
   }
-  .hero-title span { color: var(--gold); }
+  .hero-title .line2 { color: var(--gold); }
   .hero-subtitle {
-    font-size: 1rem;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-    max-width: 400px;
+    font-size: 1rem; color: var(--muted); line-height: 1.7;
+    margin-bottom: 2rem; max-width: 400px;
   }
   .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
   .btn-primary {
-    padding: 12px 28px;
-    border-radius: 14px;
-    background: var(--gold);
-    color: #1a1000;
-    font-family: 'Fredoka One', cursive;
-    font-size: 1rem;
-    border: none;
-    cursor: pointer;
+    padding: 13px 28px; border-radius: 14px;
+    background: var(--gold); color: #1a1000;
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    border: none; cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s;
     box-shadow: 0 4px 16px rgba(245,166,35,0.3);
   }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,166,35,0.4); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,166,35,0.45); }
   .btn-secondary {
-    padding: 12px 28px;
-    border-radius: 14px;
-    background: transparent;
-    color: var(--text);
-    font-family: 'Fredoka One', cursive;
-    font-size: 1rem;
-    border: 1.5px solid var(--border);
-    cursor: pointer;
+    padding: 13px 28px; border-radius: 14px;
+    background: transparent; color: var(--text);
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    border: 1.5px solid var(--border); cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
   }
   .btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
 
-  /* hero board */
   .hero-board {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 2px solid rgba(255,255,255,0.1);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    display: grid; grid-template-columns: repeat(8,1fr);
+    border-radius: 16px; overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.12);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,166,35,0.1);
     aspect-ratio: 1;
   }
   .hero-board-cell { aspect-ratio: 1; }
   .hero-board-cell.light { background: #f0d9b5; }
-  .hero-board-cell.dark { background: #b58863; }
+  .hero-board-cell.dark  { background: #b58863; }
 
-  /* stats */
+  /* STATS */
   .stats-bar {
     background: var(--panel);
     border-top: 1px solid var(--border);
@@ -178,226 +174,204 @@
     padding: 1.5rem 2rem;
   }
   .stats-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 1rem;
+    max-width: 1000px; margin: 0 auto;
+    display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem;
   }
   .stat { text-align: center; }
   .stat-val { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--gold); }
-  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+  .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
 
-  /* ── SECTIONS ── */
-  .section {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 3.5rem 2rem;
-  }
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  .section-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.6rem;
-    color: var(--text);
-  }
+  /* SECTIONS */
+  .section { max-width: 1000px; margin: 0 auto; padding: 3.5rem 2rem; }
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+  .section-title { font-family: 'Fredoka One', cursive; font-size: 1.7rem; color: var(--text); }
   .section-title span { color: var(--gold); }
-  .section-see-all {
-    font-size: 0.85rem;
-    color: var(--muted);
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .section-see-all:hover { color: var(--text); }
+  .section-note { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
 
-  /* ── GAMES GRID ── */
-  .games-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 14px;
-  }
-
+  /* GAMES GRID */
+  .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; }
   .game-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.4rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1.4rem;
     transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    cursor: pointer; display: flex; flex-direction: column; gap: 10px;
   }
-  .game-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.15); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
-  .game-card.coming-soon { opacity: 0.6; cursor: default; }
+  .game-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.15); box-shadow: 0 12px 32px rgba(0,0,0,0.35); }
+  .game-card.coming-soon { opacity: 0.55; cursor: default; }
   .game-card.coming-soon:hover { transform: none; box-shadow: none; }
-
   .game-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
   .game-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
+    width: 44px; height: 44px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Fredoka One', cursive;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    font-family: 'Fredoka One', cursive; font-size: 0.82rem; letter-spacing: 0.5px;
   }
-  .icon-gold { background: rgba(245,166,35,0.15); color: var(--gold); }
-  .icon-blue { background: rgba(0,180,216,0.15); color: var(--blue); }
-  .icon-green { background: rgba(76,175,125,0.15); color: var(--green); }
-  .icon-purple { background: rgba(124,111,205,0.15); color: var(--purple); }
-  .icon-red { background: rgba(233,69,96,0.15); color: var(--accent); }
+  .icon-gold   { background: rgba(245,166,35,0.15); color: var(--gold); }
+  .icon-blue   { background: rgba(0,180,216,0.15);  color: var(--blue); }
+  .icon-green  { background: rgba(76,175,125,0.15); color: var(--green); }
+  .icon-purple { background: rgba(124,111,205,0.15);color: var(--purple); }
+  .icon-orange { background: rgba(255,112,67,0.15); color: var(--orange); }
+  .icon-accent { background: rgba(233,69,96,0.15);  color: var(--accent); }
 
-  .badge {
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 99px;
-    letter-spacing: 0.3px;
-  }
-  .badge-live { background: rgba(76,175,125,0.15); color: var(--green); border: 1px solid rgba(76,175,125,0.25); }
-  .badge-soon { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
+  .badge { font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; letter-spacing: 0.3px; }
+  .badge-live { background:rgba(76,175,125,0.15); color:var(--green); border:1px solid rgba(76,175,125,0.25); }
+  .badge-soon { background:rgba(255,255,255,0.06); color:var(--muted); border:1px solid var(--border); }
 
-  .game-name { font-family: 'Fredoka One', cursive; font-size: 1.05rem; color: var(--text); }
-  .game-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; flex: 1; }
+  .game-name { font-family:'Fredoka One',cursive; font-size:1.05rem; color:var(--text); }
+  .game-desc { font-size:0.8rem; color:var(--muted); line-height:1.5; flex:1; }
   .game-play-btn {
-    display: block;
-    text-align: center;
-    padding: 9px;
-    border-radius: 10px;
-    background: rgba(245,166,35,0.12);
-    color: var(--gold);
-    font-family: 'Fredoka One', cursive;
-    font-size: 0.9rem;
-    border: 1px solid rgba(245,166,35,0.2);
-    transition: background 0.15s;
-    cursor: pointer;
+    display: block; text-align: center; padding: 9px;
+    border-radius: 10px; background: rgba(245,166,35,0.12);
+    color: var(--gold); font-family:'Fredoka One',cursive; font-size:0.88rem;
+    border: 1px solid rgba(245,166,35,0.2); transition: background 0.15s; cursor: pointer;
   }
   .game-play-btn:hover { background: rgba(245,166,35,0.22); }
   .game-disabled-btn {
-    display: block;
-    text-align: center;
-    padding: 9px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.04);
-    color: var(--muted);
-    font-family: 'Fredoka One', cursive;
-    font-size: 0.9rem;
+    display: block; text-align: center; padding: 9px;
+    border-radius: 10px; background: rgba(255,255,255,0.04);
+    color: var(--muted); font-family:'Fredoka One',cursive; font-size:0.88rem;
     border: 1px solid var(--border);
   }
 
-  /* ── CLASSES ── */
-  .classes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-  }
+  /* CLASSES */
+  .classes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
   .class-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.4rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1.4rem;
     transition: transform 0.2s, border-color 0.2s;
     cursor: pointer;
   }
   .class-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.15); }
-
   .class-level-bar {
-    height: 4px;
-    border-radius: 99px;
-    margin-bottom: 1rem;
-    width: 100%;
-    background: var(--border);
-    position: relative;
-    overflow: hidden;
+    height: 4px; border-radius: 99px; margin-bottom: 1rem;
+    background: var(--border); overflow: hidden;
   }
   .class-level-fill { height: 100%; border-radius: 99px; }
-  .fill-beg { width: 30%; background: var(--green); }
-  .fill-int { width: 65%; background: var(--blue); }
-  .fill-adv { width: 100%; background: var(--purple); }
-
-  .class-tag {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 0.4rem;
-  }
-  .tag-beg { color: var(--green); }
-  .tag-int { color: var(--blue); }
-  .tag-adv { color: var(--purple); }
-
-  .class-name { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem; }
-  .class-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-bottom: 1rem; }
-  .class-topics { display: flex; flex-wrap: wrap; gap: 6px; }
+  .fill-beg { width:30%; background:var(--green); }
+  .fill-int { width:65%; background:var(--blue); }
+  .fill-adv { width:100%; background:var(--purple); }
+  .class-tag { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:0.4rem; }
+  .tag-beg { color:var(--green); } .tag-int { color:var(--blue); } .tag-adv { color:var(--purple); }
+  .class-name { font-family:'Fredoka One',cursive; font-size:1.1rem; color:var(--text); margin-bottom:0.4rem; }
+  .class-desc { font-size:0.8rem; color:var(--muted); line-height:1.5; margin-bottom:1rem; }
+  .class-topics { display:flex; flex-wrap:wrap; gap:6px; }
   .topic-pill {
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 99px;
-    background: rgba(255,255,255,0.06);
-    color: var(--muted);
-    border: 1px solid var(--border);
+    font-size:0.7rem; font-weight:700; padding:3px 10px; border-radius:99px;
+    background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border);
   }
 
-  /* ── DIVIDER ── */
-  .section-divider {
-    max-width: 1000px;
-    margin: 0 auto;
-    border: none;
-    border-top: 1px solid var(--border);
+  .section-divider { max-width:1000px; margin:0 auto; border:none; border-top:1px solid var(--border); }
+
+  /* ABOUT */
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .about-card {
+    background:var(--card); border:1px solid var(--border); border-radius:20px; padding:1.4rem;
   }
+  .about-card-title { font-family:'Fredoka One',cursive; font-size:1.05rem; color:var(--text); margin-bottom:0.5rem; }
+  .about-card-text { font-size:0.82rem; color:var(--muted); line-height:1.6; }
 
   /* ── FOOTER ── */
   footer {
+    background: var(--panel);
     border-top: 1px solid var(--border);
-    padding: 2rem;
-    text-align: center;
+    margin-top: 2rem;
   }
-  .footer-logo {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.3rem;
-    color: var(--text);
-    margin-bottom: 0.4rem;
+  .footer-stripe {
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--accent), var(--blue), var(--green), var(--purple));
   }
-  .footer-logo span { color: var(--gold); }
-  .footer-text { font-size: 0.82rem; color: var(--muted); }
+  .footer-inner {
+    max-width: 1000px; margin: 0 auto;
+    padding: 3rem 2rem 2rem;
+    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    gap: 2rem;
+  }
+  .footer-brand {}
+  .footer-logo { font-family:'Fredoka One',cursive; font-size:1.5rem; color:var(--text); margin-bottom:0.5rem; }
+  .footer-logo span { color:var(--gold); }
+  .footer-tagline { font-size:0.82rem; color:var(--muted); line-height:1.6; margin-bottom:1.2rem; max-width:280px; }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 640px) {
-    .hero { grid-template-columns: 1fr; padding: 3rem 1.2rem 2rem; gap: 2rem; }
-    .hero-board { max-width: 260px; margin: 0 auto; }
-    .hero-title { font-size: 2.2rem; }
-    .nav-links { display: none; }
-    .section { padding: 2.5rem 1.2rem; }
+  .footer-address {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.9rem 1rem;
+    font-size: 0.8rem; color: var(--muted); line-height: 1.8;
+  }
+  .footer-address strong { color:var(--text); font-weight:700; display:block; margin-bottom:3px; }
+
+  .footer-contact-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 0.8rem;
+  }
+  .contact-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(76,175,125,0.12);
+    border: 1px solid rgba(76,175,125,0.25);
+    border-radius: 99px; padding: 5px 14px;
+    font-size: 0.82rem; font-weight: 700; color: var(--green);
+  }
+  .phone-dot { width:7px; height:7px; border-radius:50%; background:var(--green); }
+
+  .footer-col-title { font-family:'Fredoka One',cursive; font-size:0.95rem; color:var(--text); margin-bottom:0.8rem; }
+  .footer-links { list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .footer-links a { font-size:0.82rem; color:var(--muted); transition:color 0.2s; }
+  .footer-links a:hover { color:var(--text); }
+
+  .footer-bottom {
+    max-width:1000px; margin:0 auto;
+    padding: 1.2rem 2rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .footer-copy { font-size:0.75rem; color:var(--muted); }
+  .footer-made { font-size:0.75rem; color:var(--muted); }
+
+  /* RESPONSIVE */
+  @media(max-width:680px) {
+    .hero { grid-template-columns:1fr; padding:3rem 1.2rem 2rem; gap:2rem; }
+    .hero-board { max-width:260px; margin:0 auto; }
+    .hero-title { font-size:2.3rem; }
+    .nav-links, .nav-phone { display:none; }
+    .section { padding:2.5rem 1.2rem; }
+    .footer-inner { grid-template-columns:1fr; }
+    .about-grid { grid-template-columns:1fr; }
+    .footer-bottom { flex-direction:column; text-align:center; }
   }
 </style>
 </head>
 <body>
 
+<!-- NAV STRIPE -->
+<div class="nav-stripe"></div>
+
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <div class="nav-logo">AD <span>Chess</span></div>
+    <div class="nav-logo">
+      <div class="nav-logo-icon">AD</div>
+      <span>AD <span>Chess</span></span>
+    </div>
     <ul class="nav-links">
-      <li><a href="#games">Games</a></li>
-      <li><a href="#classes">Classes</a></li>
-      <li><a href="#about">About</a></li>
+      <li><a href="#games" class="active"><span class="nav-dot dot-games"></span> Games</a></li>
+      <li><a href="#classes"><span class="nav-dot dot-classes"></span> Classes</a></li>
+      <li><a href="#about"><span class="nav-dot dot-about"></span> About</a></li>
     </ul>
-    <button class="nav-cta" onclick="document.getElementById('classes').scrollIntoView({behavior:'smooth'})">Enroll</button>
+    <div class="nav-right">
+      <div class="nav-phone">
+        <div class="nav-phone-icon"><div class="phone-circle"></div></div>
+        7842059280
+      </div>
+      <button class="nav-cta" onclick="document.getElementById('classes').scrollIntoView({behavior:'smooth'})">Enroll</button>
+    </div>
   </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-left">
-    <div class="hero-tag"><div class="hero-tag-dot"></div> AD Chess Academy</div>
-    <h1 class="hero-title">Learn Chess.<br><span>Play Smart.</span></h1>
+  <div>
+    <div class="hero-tag"><div class="tag-pulse"></div> AD Chess Academy</div>
+    <h1 class="hero-title">Learn Chess.<br><span class="line2">Play Smart.</span></h1>
     <p class="hero-subtitle">Classes, puzzles, and games designed to build chess thinking from the ground up — for every age and level.</p>
     <div class="hero-btns">
       <button class="btn-primary" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">Play Games</button>
@@ -411,7 +385,7 @@
 <div class="stats-bar">
   <div class="stats-inner">
     <div class="stat"><div class="stat-val">3</div><div class="stat-label">Class levels</div></div>
-    <div class="stat"><div class="stat-val">2</div><div class="stat-label">Games live</div></div>
+    <div class="stat"><div class="stat-val">3</div><div class="stat-label">Games live</div></div>
     <div class="stat"><div class="stat-val">4+</div><div class="stat-label">Games coming</div></div>
     <div class="stat"><div class="stat-val">Free</div><div class="stat-label">To play</div></div>
   </div>
@@ -421,7 +395,7 @@
 <section class="section" id="games">
   <div class="section-header">
     <h2 class="section-title">Chess <span>Games</span></h2>
-    <span class="section-see-all">More coming soon</span>
+    <span class="section-note">More coming soon</span>
   </div>
   <div class="games-grid">
 
@@ -431,7 +405,7 @@
         <span class="badge badge-live">Live</span>
       </div>
       <div class="game-name">Square Color</div>
-      <div class="game-desc">Name a square — is it white or black? Build your board vision with 10 quick questions.</div>
+      <div class="game-desc">Name a square — is it white or black? Build board vision with 10 quick questions.</div>
       <div class="game-play-btn">Play Now</div>
     </div>
 
@@ -442,6 +416,16 @@
       </div>
       <div class="game-name">Same Color?</div>
       <div class="game-desc">Two squares — same color or different? Master the even and odd pattern.</div>
+      <div class="game-play-btn">Play Now</div>
+    </div>
+
+    <div class="game-card" onclick="window.location.href='chess-piece-quiz.html'">
+      <div class="game-card-top">
+        <div class="game-icon icon-orange">PQ</div>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <div class="game-name">Piece Quiz</div>
+      <div class="game-desc">Know your pieces? Match each piece to its notation letter and point value.</div>
       <div class="game-play-btn">Play Now</div>
     </div>
 
@@ -467,17 +451,7 @@
 
     <div class="game-card coming-soon">
       <div class="game-card-top">
-        <div class="game-icon icon-red">PZ</div>
-        <span class="badge badge-soon">Soon</span>
-      </div>
-      <div class="game-name">Piece Puzzles</div>
-      <div class="game-desc">Which piece controls that square? Test your piece knowledge quickly.</div>
-      <div class="game-disabled-btn">Coming Soon</div>
-    </div>
-
-    <div class="game-card coming-soon">
-      <div class="game-card-top">
-        <div class="game-icon icon-gold">RK</div>
+        <div class="game-icon icon-accent">RK</div>
         <span class="badge badge-soon">Soon</span>
       </div>
       <div class="game-name">Rank and File</div>
@@ -494,10 +468,9 @@
 <section class="section" id="classes">
   <div class="section-header">
     <h2 class="section-title">Chess <span>Classes</span></h2>
-    <span class="section-see-all">Enroll now</span>
+    <span class="section-note">Enroll now</span>
   </div>
   <div class="classes-grid">
-
     <div class="class-card">
       <div class="class-level-bar"><div class="class-level-fill fill-beg"></div></div>
       <div class="class-tag tag-beg">Beginner</div>
@@ -509,7 +482,6 @@
         <span class="topic-pill">Check and mate</span>
       </div>
     </div>
-
     <div class="class-card">
       <div class="class-level-bar"><div class="class-level-fill fill-int"></div></div>
       <div class="class-tag tag-int">Intermediate</div>
@@ -521,7 +493,6 @@
         <span class="topic-pill">Discovered attacks</span>
       </div>
     </div>
-
     <div class="class-card">
       <div class="class-level-bar"><div class="class-level-fill fill-adv"></div></div>
       <div class="class-tag tag-adv">Advanced</div>
@@ -533,7 +504,6 @@
         <span class="topic-pill">Planning</span>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -544,31 +514,88 @@
   <div class="section-header">
     <h2 class="section-title">About <span>AD Chess</span></h2>
   </div>
-  <div style="background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; max-width: 600px;">
-    <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.8; margin-bottom: 1rem;">
-      AD Chess Academy is dedicated to teaching chess in a fun, structured, and engaging way — from complete beginners to competitive players.
-    </p>
-    <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.8;">
-      Our games are designed to reinforce classroom concepts so students can practice anytime, anywhere. More games and lessons are added regularly.
-    </p>
+  <div class="about-grid">
+    <div class="about-card">
+      <div class="about-card-title">Our Mission</div>
+      <div class="about-card-text">AD Chess Academy is dedicated to teaching chess in a fun, structured, and engaging way — from complete beginners to competitive players. Our games reinforce classroom concepts so students can practice anytime, anywhere.</div>
+    </div>
+    <div class="about-card">
+      <div class="about-card-title">Why Chess?</div>
+      <div class="about-card-text">Chess builds critical thinking, concentration, and problem-solving skills that benefit students in every area of life. We make learning chess enjoyable and accessible for all ages.</div>
+    </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">AD <span>Chess</span></div>
-  <div class="footer-text">AD Chess Academy — All games free to play</div>
+  <div class="footer-stripe"></div>
+  <div class="footer-inner">
+
+    <div class="footer-brand">
+      <div class="footer-logo">AD <span>Chess</span></div>
+      <div class="footer-tagline">Building chess champions one move at a time. Classes for all ages and levels in Visakhapatnam.</div>
+      <div class="footer-address">
+        <strong>Branch: 503, KP Icon</strong>
+        Yendada, Visakhapatnam<br>
+        Andhra Pradesh, India
+      </div>
+      <div class="footer-contact-row">
+        <div class="contact-pill">
+          <div class="phone-dot"></div>
+          7842059280
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Games</div>
+      <ul class="footer-links">
+        <li><a href="chess-square-game.html">Square Color</a></li>
+        <li><a href="chess-same-color.html">Same Color?</a></li>
+        <li><a href="chess-piece-quiz.html">Piece Quiz</a></li>
+        <li><a href="#games">More coming soon</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Classes</div>
+      <ul class="footer-links">
+        <li><a href="#classes">Beginner</a></li>
+        <li><a href="#classes">Intermediate</a></li>
+        <li><a href="#classes">Advanced</a></li>
+        <li><a href="#classes">Enroll now</a></li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">AD Chess Academy — All games free to play</div>
+    <div class="footer-made">Visakhapatnam, Andhra Pradesh</div>
+  </div>
 </footer>
 
 <script>
   const board = document.getElementById('hero-board');
-  for (let row = 7; row >= 0; row--) {
-    for (let col = 0; col < 8; col++) {
-      const cell = document.createElement('div');
-      cell.className = 'hero-board-cell ' + ((row + col) % 2 === 0 ? 'dark' : 'light');
+  for(let row=7;row>=0;row--){
+    for(let col=0;col<8;col++){
+      const cell=document.createElement('div');
+      cell.className='hero-board-cell '+((row+col)%2===0?'dark':'light');
       board.appendChild(cell);
     }
   }
+  const links = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll',()=>{
+    const sections=['games','classes','about'];
+    let current='';
+    sections.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el && window.scrollY>=el.offsetTop-100) current=id;
+    });
+    links.forEach(a=>{
+      a.classList.remove('active');
+      if(a.getAttribute('href')==='#'+current) a.classList.add('active');
+    });
+  });
 </script>
 </body>
 </html>
